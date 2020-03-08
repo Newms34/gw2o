@@ -34,6 +34,11 @@ const profs = {
 				bulmabox.alert('API Key', `An API (Application Programming Interface) key allows you to access particular information about your account. It's perfectly safe (it's read-only!). <hr>Head on over to <a href='http://account.arena.net/'>the official ArenaNet site</a> to grab a key! You'll need the Characters and Inventories permissions.`)
 			},
 			checkKey() {
+				console.log('KEY is',this.apiKey)
+				if(!this.apiKey || !localStorage.gw2OrgCookie){
+					return false;
+				}
+				return false
 				axios.get('https://api.guildwars2.com/v2/tokeninfo?access_token=' + this.apiKey).then(r => {
 					this.loaded = true;
 					if (r.status == 401 || r.status == 404 || r.status == 403) {
