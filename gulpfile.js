@@ -66,7 +66,7 @@ gulp.task('sass', function () {
         .pipe(sass())
         .pipe(concat('styles.css'))
         .pipe(cleany())
-        .pipe(gulp.dest('out/css'));
+        .pipe(gulp.dest('css'));
 });
 
 // Concatenate & Minify JS
@@ -93,7 +93,7 @@ gulp.task('scripts', function () {
         .pipe(addSrc.prepend(['src/js/libs/*.js']))
         .pipe(concat('all.js'))
         .pipe(rename('all.min.js'))
-        .pipe(gulp.dest('out/js'));
+        .pipe(gulp.dest('js'));
 });
 // Watch Files For Changes
 gulp.task('watch', function () {
