@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>GW2 Organizer V2.0</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.8.0/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body>
+    <div id="main" class="is-fullwidth is-fullheight">
+        <div class="is-fullwidth">
+            <div class="is-pulled-right">
+                <a href="https://github.com/Newms34/gw2o" target="_blank">
+                    <i class="fa fa-github"></i>&nbsp;Check me out on GitHub
+                </a>
+            </div>
+        </div>
+        <br>
+        <div class="is-fullwidth columns">
+            <div class="column is-one-fifth">&nbsp;</div>
+            <div class="column is-three-fifths">
+                <div class="panel is-info">
+                    <div class="panel-heading">GW2 Bag Slot Organizer</div>
+                    <div class="panel-body has-background-white">
+                        <div class="is-fullwidth columns is-multiline">
+                            <div class="column is-one-fifth has-text-weight-bold has-text-centered">API Key:
+                                <button class="button is-small is-danger has-text-weight-bold" v-on:click='explApi()'><i class="fa fa-question-circle is-size-6"></i></button>
+                                <i class="fa fa-check has-text-success is-pulled-right is-size-3" title='Your API key works!' v-show='keyOkay'></i>
+                                <i class="fa fa-times has-text-danger is-pulled-right is-size-3" title='There is an issue with your API Key!' v-show='!keyOkay'></i>
+                            </div>
+                            <div class="column is-three-fifths">
+                                <div class="field">
+                                    <input type="text" class="input" v-model='apiKey'>
+                                </div>
+                            </div>
+                            <div class="column is-one-fifth">
+                                <button class="button is-link" v-on:click='replaceKey()'><i class="fa fa-key"></i>&nbsp;Apply Key</button>
+                            </div>
+                            <div class="column is-full">
+                                <div class="message message-body is-size-7 is-half">
+                                    <div class="has-text-weight-bold is-fullwidth is-size-5">Key:</div>
+                                    <div class="is-fullwidth">
+                                        <i class="fa fa-check-circle has-text-success is-size-2"></i>: Character <i>does</i> have maximum number of bag slots, and their bags are <i>not</i> full.
+                                    </div>
+                                    <div class="is-fullwidth">
+                                        <i class="fa fa-circle has-text-warning is-size-2"></i>: Character does <i>not</i> have maximum number of bag slots, and their bags are <i>not</i> full.
+                                    </div>
+                                    <div class="is-fullwidth">
+                                        <i class="fa fa-exclamation-circle has-text-orange is-size-2"></i>: Character does <i>not</i> have maximum number of bag slots, and their bags <i>are</i> all full.
+                                    </div>
+                                    <div class="is-fullwidth">
+                                        <i class="fa fa-times-circle has-text-danger is-size-2"></i>: Character <i>does</i> have maximum number of bag slots, and their bags <i>are</i> all full.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column is-full">
+                                <table class="table is-striped is-fullwidth">
+                                    <thead>
+                                        <tr>
+                                            <th class='hover-col' v-on:click='changeSort("name")'>
+                                                Character Name
+                                                <i class="fa fa-caret-down" v-show='sorter.col=="name" && !sorter.rev'></i>
+                                                <i class="fa fa-caret-up" v-show='sorter.col=="name" && sorter.rev'></i>
+                                            </th>
+                                            <th class='hover-col' v-on:click='changeSort("profession")'>
+                                                Profession
+                                                <i class="fa fa-caret-down" v-show='sorter.col=="profession" && !sorter.rev'></i>
+                                                <i class="fa fa-caret-up" v-show='sorter.col=="profession" && sorter.rev'></i>
+                                            </th>
+                                            <th class='hover-col' v-on:click='changeSort("race")'>
+                                                Race
+                                                <i class="fa fa-caret-down" v-show='sorter.col=="race" && !sorter.rev'></i>
+                                                <i class="fa fa-caret-up" v-show='sorter.col=="race" && sorter.rev'></i>
+                                            </th>
+                                            <th>
+                                                Bags
+                                            </th>
+                                            <th>&nbsp;</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-show='!loaded'>
+                                            <td colspan='5' class='is-italic has-text-grey has-text-centered'>Loading... Please wait!</td>
+                                        </tr>
+                                        <tr v-show='!chars.length && loaded'>
+                                            <td colspan='5' class='is-italic has-text-grey has-text-centered'>Enter a valid API key and click Apply Key above!</td>
+                                        </tr>
+                                        <tr v-for='chr in charsSorted'>
+                                            <td>
+                                                {{chr.name}}
+                                            </td>
+                                            <td>
+                                                <img v-bind:src="profs[chr.profession]" class='icon'>{{chr.profession}}
+                                            </td>
+                                            <td>
+                                                {{chr.race}}
+                                            </td>
+                                            <td>
+                                                <!-- {{chr.bagTotals}} -->
+                                                <span class="has-text-weight-bold">
+                                                    Max-sized bags (32-slot):
+                                                </span>
+                                                <span>
+                                                    {{chr.bagTotals.max}}
+                                                </span>
+                                                <br>
+                                                <span class="has-text-weight-bold">
+                                                    Used bag slots:
+                                                </span>
+                                                <span>
+                                                    {{chr.bagTotals.used}}/{{chr.bagTotals.totalSlots}} ({{chr.bagTotals.usedFilled}}/{{chr.bagTotals.used}} filled)
+                                                </span>
+                                                <br>
+                                                <span class="has-text-weight-bold">
+                                                    Slots bought
+                                                </span>
+                                                <span>
+                                                    {{chr.bagTotals.totalSlots}}/10
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div title="This character has the maximum number of bag slots, and they're not all full." v-show='chr.bagTotals.totalSlots==10 && chr.bagTotals.usedFilled<10'>
+                                                    <i class="fa fa-check-circle has-text-success is-size-2"></i>
+                                                </div>
+                                                <div title="This char does not have the maximum number of bag slots, but they're also not all full." v-show='chr.bagTotals.totalSlots<10 && chr.bagTotals.totalSlots!==chr.bagTotals.usedFilled'>
+                                                    <i class="fa fa-circle has-text-warning is-size-2"></i>
+                                                </div>
+                                                <div title="This char does not have the maximum number of bag slots, but all available bags are full! Buy some bag slots!" v-show='chr.bagTotals.totalSlots<10 && chr.bagTotals.totalSlots==chr.bagTotals.usedFilled'>
+                                                    <i class="fa fa-exclamation-circle has-text-orange is-size-2"></i>
+                                                </div>
+                                                <div title="This char has the maximum number of bag slots, and they're all full." v-show='chr.bagTotals.totalSlots==10 && chr.bagTotals.usedFilled==10'>
+                                                    <i class="fa fa-times-circle has-text-danger is-size-2"></i>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-foot" v-show='!acceptedCookie'>
+            Hey! This site uses cookies to store your GW2 API key. It's just local though!&nbsp;
+            <button class="button is-danger" v-on:click='acceptCookie()'>Accept Cookies</button>
+        </div>
+    </div>
+    <script src="./js/all.min.js"></script>
+</body>
+
+</html>
