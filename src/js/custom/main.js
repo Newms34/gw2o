@@ -34,19 +34,18 @@ const profs = {
 				bulmabox.alert('API Key', `An API (Application Programming Interface) key allows you to access particular information about your account. It's perfectly safe (it's read-only!). <hr>Head on over to <a href='http://account.arena.net/'>the official ArenaNet site</a> to grab a key! You'll need the Characters and Inventories permissions.`)
 			},
 			checkKey() {
-				console.log('KEY is',this.apiKey)
-				if(!this.apiKey || !localStorage.gw2OrgCookie){
+				const self=this;
+				if(!self.apiKey || !localStorage.gw2OrgCookie){
 					return false;
 				}
-				return false
-				axios.get('https://api.guildwars2.com/v2/tokeninfo?access_token=' + this.apiKey).then(r => {
-					this.loaded = true;
+				axios.get('https://api.guildwars2.com/v2/tokeninfo?access_token=' + self.apiKey).then(r => {
+					self.loaded = true;
 					if (r.status == 401 || r.status == 404 || r.status == 403) {
-						this.keyOkay = false;
+						self.keyOkay = false;
 						throw new Error('invalid key');
 					} else {
-						this.keyOkay = true;
-						this.applyKey();
+						self.keyOkay = true;
+						self.applyKey();
 					}
 				}).catch(e => {
 					bulmabox.alert('Invalid API Key', `Sorry, but we can't seem to read your API key!`)
@@ -67,6 +66,8 @@ const profs = {
 						this.keyOkay = false;
 						throw new Error('invalid key');
 					} else {
+						this.keyOkay = true;
+						this.loaded = true;
 						this.acceptedCookie = this.apiKey;
 						localStorage.gw2OrgCookie = this.apiKey;
 						this.applyKey();
