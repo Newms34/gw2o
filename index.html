@@ -84,7 +84,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-show='!loaded'>
+                                        <tr v-show='!loaded && keyOkay'>
                                             <td colspan='5' class='is-italic has-text-grey has-text-centered'>Loading... Please wait!</td>
                                         </tr>
                                         <tr v-show='!chars.length && loaded'>
